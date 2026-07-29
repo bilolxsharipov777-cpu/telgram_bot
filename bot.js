@@ -9,7 +9,7 @@ const sqlite3 = require('sqlite3').verbose();
 
 const BOT_TOKEN = '8923561969:AAELBftxJNjVgwuuueFHXQMjpmbNHePb4ow';
 const ADMIN_ID = 5148047459;
-";
+
 
 const bot = new Telegraf(BOT_TOKEN);
 
