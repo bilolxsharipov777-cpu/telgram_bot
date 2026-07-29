@@ -10,7 +10,7 @@ const sqlite3 = require('sqlite3').verbose();
 const BOT_TOKEN = '8923561969:AAELBftxJNjVgwuuueFHXQMjpmbNHePb4ow';
 const ADMIN_ID = 867717817;
 
-const bot = new Telegraf("8923561969:AAELBftxJNjVgwuuueFHXQMjpmbNHePb4ow");
+const bot = new Telegraf(BOT_TOKEN);
 
 const db = new sqlite3.Database('./bot_database.db', (err) => {
   if (err) console.error('❌ Маʼlumotlar bazasini ochishda xatolik: ', err.message);
@@ -56,10 +56,10 @@ const langData = {
     btn_yes: "✅ Ҳа",
     btn_no: "❌ Йўқ",
     
-    card_info: "💳 Карта рақами:\n9860 1234 5678 9010\n\n📷 Тўлов чекини юборинг.",
+    card_info: "💳 Карта рақами:\n<code>9860 1234 5678 9010</code>\n\n📷 Тўлов чекини юборинг.",
     booking_success: "✅ Буюртмангиз муваффақиятли қабул қилинди.",
     
-    parcel_intro: "📦 Почта юбориш\n\nҚаердан қаерга?",
+    parcel_intro: "📦 <b>Почта юбориш</b>\n\nҚаердан қаерга?",
     parcel_desc_prompt: "✍️ Почта ва нима юubormoqchi ekanligingizni ёзиб қолдиринг:",
     parcel_phone_prompt: "📞 Юборувчи/қабул қилувчи телефон рақамини киритинг:",
     parcel_success: "✅ Почта буюртмаси қабул қилинди!",
@@ -102,7 +102,7 @@ bot.start(async (ctx) => {
   db.run(`INSERT OR IGNORE INTO users (id, language, joined_date) VALUES (?, 'uz', ?)`, [userId, new Date().toISOString()]);
   userState[userId] = { step: 'idle' };
   
-  await ctx.reply(`Ассалому алайкум ${userName}  ! Хуш келибсиз!`, {
+  await ctx.reply(`Ассалому алайкум <b>${userName}</b> 💻 ! Хуш келибсиз!`, {
     parse_mode: 'HTML',
     ...getMainMenu('uz', userId)
   });
@@ -185,7 +185,7 @@ bot.on('text', async (ctx, next) => {
     if (text !== t.route_1 && text !== t.route_2) return ctx.reply("Илтимос, тугмани танланг:");
     state.route = text;
     state.step = 'book_datetime';
-    return ctx.reply(t.ask_datetime, Markup.keyboard([[t.back_to_menu]]).resize(), { parse_mode: 'HTML' });
+    return ctx.reply(t.ask_datetime, { parse_mode: 'HTML', ...Markup.keyboard([[t.back_to_menu]]).resize() });
   }
 
   if (state.step === 'book_datetime') {
@@ -227,7 +227,7 @@ bot.on('text', async (ctx, next) => {
     if (text === t.btn_yes) {
       state.prepay = 'Ҳа';
       state.step = 'book_receipt';
-      return ctx.reply(t.card_info, Markup.keyboard([[t.back_to_menu]]).resize(), { parse_mode: 'HTML' });
+      return ctx.reply(t.card_info, { parse_mode: 'HTML', ...Markup.keyboard([[t.back_to_menu]]).resize() });
     } else {
       state.prepay = "Йўқ";
       await finalizeBooking(ctx, userId, state, lang);
@@ -259,7 +259,7 @@ bot.on('text', async (ctx, next) => {
     await ctx.reply(t.parcel_success, getMainMenu(lang, userId));
 
     try {
-      await bot.telegram.sendMessage(ADMIN_ID, `📦 Янги почта!\n\n📍 Йўналиш: <b>${state.parcelRoute}</b>\n📝 Тавсиф: ${state.parcelDesc}\n📞 Тел: <b>${state.parcelPhone}</b>\n👤 User ID: <code>${userId}</code>`, { parse_mode: 'HTML' });
+      await bot.telegram.sendMessage(ADMIN_ID, `📦 <b>Янги почта!</b>\n\n📍 Йўналиш: <b>${state.parcelRoute}</b>\n📝 Тавсиф: ${state.parcelDesc}\n📞 Тел: <b>${state.parcelPhone}</b>\n👤 User ID: <code>${userId}</code>`, { parse_mode: 'HTML' });
     } catch (e) { console.error(e); }
     return;
   }
@@ -289,7 +289,7 @@ bot.on('contact', async (ctx) => {
     await ctx.reply(t.parcel_success, getMainMenu(lang, userId));
 
     try {
-      await bot.telegram.sendMessage(ADMIN_ID, `📦 Янги почта!\n\n📍 Йўналиш: ${state.parcelRoute}\n📝 Тавсиф: ${state.parcelDesc}\n📞 Тел: <b>${state.parcelPhone}</b>\n👤 User ID: <code>${userId}</code>`, { parse_mode: 'HTML' });
+      await bot.telegram.sendMessage(ADMIN_ID, `📦 <b>Янги почта!</b>\n\n📍 Йўналиш: <b>${state.parcelRoute}</b>\n📝 Тавсиф: ${state.parcelDesc}\n📞 Тел: <b>${state.parcelPhone}</b>\n👤 User ID: <code>${userId}</code>`, { parse_mode: 'HTML' });
     } catch (e) { console.error(e); }
   }
 });
@@ -314,7 +314,7 @@ bot.on('photo', async (ctx) => {
         
         try {
           await bot.telegram.sendPhoto(ADMIN_ID, photoId, {
-            caption: `🚖 Янги буюртма (Тўлов чеки bilan)!\n\n📍 Йўналиш: ${state.route}\n📅 Вақт: ${state.datetime}\n👥 Одам сони: ${state.passengers}\n👤 Исм: ${state.fullname}\n📞 Тел: ${state.phone}\n💳 Олindan тўлов: Ҳа`,
+            caption: `🚖 <b>Янги буюртма (Тўлов чеки bilan)!</b>\n\n📍 Йўналиш: ${state.route}\n📅 Вақт: ${state.datetime}\n👥 Одам сони: ${state.passengers}\n👤 Исм: ${state.fullname}\n📞 Тел: ${state.phone}\n💳 Олindan тўлов: Ҳа`,
             parse_mode: 'HTML'
           });
         } catch (e) {
@@ -360,7 +360,7 @@ async function finalizeBooking(ctx, userId, state, lang) {
       userState[userId] = { step: 'idle' };
       await ctx.reply(t.booking_success, getMainMenu(lang, userId));
       try {
-        await bot.telegram.sendMessage(ADMIN_ID, `🚖 Янги буюртма!\n\n📍 ${state.route}\n📅 ${state.datetime}\n👥 ${state.passengers}\n👤 ${state.fullname}\n📞 ${state.phone}`, { parse_mode: 'HTML' });
+        await bot.telegram.sendMessage(ADMIN_ID, `🚖 <b>Янги буюртма!</b>\n\n📍 ${state.route}\n📅 ${state.datetime}\n👥 ${state.passengers}\n👤 ${state.fullname}\n📞 ${state.phone}`, { parse_mode: 'HTML' });
       } catch (e) {}
     }
   );
