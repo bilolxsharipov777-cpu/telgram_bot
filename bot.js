@@ -8,7 +8,8 @@ const { Telegraf, Markup } = require('telegraf');
 const sqlite3 = require('sqlite3').verbose();
 
 const BOT_TOKEN = '8923561969:AAELBftxJNjVgwuuueFHXQMjpmbNHePb4ow';
-const ADMIN_ID = 867717817;
+const ADMIN_ID = "5148047459
+";
 
 const bot = new Telegraf(BOT_TOKEN);
 
